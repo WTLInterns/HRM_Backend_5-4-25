@@ -13,8 +13,10 @@ import org.springframework.stereotype.Service;
 import com.jaywant.DTO.LoginRequest;
 import com.jaywant.Jwt.JwtUtils;
 import com.jaywant.Model.AddEmployee;
+import com.jaywant.Model.Attendance;
 import com.jaywant.Model.Employee;
 import com.jaywant.Repo.AddEmployeeRepo;
+import com.jaywant.Repo.AttendanceRepo;
 import com.jaywant.Repo.EmployeeRepo;
 
 @Service
@@ -25,6 +27,10 @@ public class EmployeeService {
 	
 	@Autowired
 	private AddEmployeeRepo addEmpRepo;
+	
+    @Autowired
+    private AttendanceRepo attendanceRepo;
+
 	
 	@Autowired
 	private JwtUtils jwtUtils;
@@ -110,13 +116,23 @@ public class EmployeeService {
 		 return this.addEmpRepo.findById(empId);
 	 }
 	 
-	 public void deleteEmpId(int empId) {
-		 this.addEmpRepo.deleteById(empId);
-	 }
-	 
+	    // Updated delete method: first delete attendance records, then the employee.
+	    public void deleteEmpId(int empId) {
+	        List<Attendance> attendances = attendanceRepo.findByEmployeeEmpId(empId);
+	        for (Attendance att : attendances) {
+	            attendanceRepo.delete(att);
+	        }
+	        addEmpRepo.deleteById(empId);
+	    }
+
 	 public AddEmployee updateEmployee(AddEmployee addEmp, int empId) {
 		 addEmp.setEmpId(empId);
 		 return this.addEmpRepo.save(addEmp);
+	 }
+	 
+ 
+	 public AddEmployee findByEmployeeName(String firstName) {
+		 return this.addEmpRepo.findByFirstName(firstName);
 	 }
 
 		

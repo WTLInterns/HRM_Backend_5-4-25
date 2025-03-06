@@ -28,6 +28,9 @@ public class AdminController {
 
     @Autowired
     private EmployeeService empService;
+    
+//    @Autowired
+//    private AddEmployee 
 
     @Autowired
     private AttendaceService attService;
@@ -69,6 +72,9 @@ public class AdminController {
     @GetMapping("/deleteAddEmp/{empId}")
     public void deleteAddEmployee(@PathVariable int empId) {
         this.empService.addEmployeeDelete(empId);
+        System.out.println("deletd sucess" + empId);
+
+        
     }
 
     @GetMapping("/generateReport")
@@ -110,11 +116,13 @@ public class AdminController {
     @DeleteMapping("/deleteEmp/{empId}")
     public void deleteEmpById(@PathVariable int empId) {
         this.empService.deleteEmpId(empId);
+        System.out.println("deletd sucess" + empId);
     }
 
     @PutMapping("/update/{empId}")
     public AddEmployee updateEmp(@PathVariable int empId, @RequestBody AddEmployee addEmp) {
         return this.empService.updateEmployee(addEmp, empId);
+        
     }
 
     @GetMapping("/getAllSalary")
@@ -153,5 +161,10 @@ public class AdminController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+    
+    @GetMapping("/find/{name}")
+    public AddEmployee findByName(@PathVariable String name) {
+    	return this.empService.findByEmployeeName(name);
     }
 }

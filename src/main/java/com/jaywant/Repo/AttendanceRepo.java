@@ -20,4 +20,6 @@ public interface AttendanceRepo extends JpaRepository<Attendance, Long> {
     // Find attendance records by employee id and date.
     // This method returns a List so that duplicate records can be handled.
     List<Attendance> findByEmployeeEmpIdAndDate(int empId, String date);
+    
+    
 }

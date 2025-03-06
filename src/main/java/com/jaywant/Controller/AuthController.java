@@ -46,14 +46,16 @@ public class AuthController {
 		        String message = "You have been logged in " + loginRequest.getEmail() + " " + LocalDateTime.now();
 		        
 		        try {
-		            boolean emailSent = this.emailService.sendHtmlEmail(message, subject, loginRequest.getEmail());
+//		            boolean emailSent = this.emailService.sendHtmlEmail(message, subject, loginRequest.getEmail());
 		            
-		            if (emailSent) {
-		                return ResponseEntity.ok(loginRequest);  
-		            } else {
-		                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-		                                     .body(loginRequest);  
-		            }
+//		            if (emailSent) {
+//		                return ResponseEntity.ok(loginRequest);  
+//		            } else {
+//		                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//		                                     .body(loginRequest);  
+//		            }
+	                return ResponseEntity.ok(loginRequest);  
+
 		        } catch (Exception e) {
 		            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 		                                 .body(loginRequest);  

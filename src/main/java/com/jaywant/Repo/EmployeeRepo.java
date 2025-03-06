@@ -9,4 +9,6 @@ public interface EmployeeRepo extends JpaRepository<Employee, Integer>{
  public Employee findByEmail(String email);
  
  
+// public Employee findByName(String firstName);
+ 
 }
