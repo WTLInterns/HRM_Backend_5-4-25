@@ -54,7 +54,7 @@ public class SalaryService {
         double special = basic * 0.37;
         double totalAllowance = hra + da + special;
         double grossSalary = basic + totalAllowance;
-        double professionalTax = monthlyCtc * 0.02;
+        double professionalTax = 0.0;
         double tds = 0.0;
 
         // Attendance tracking
