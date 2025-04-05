@@ -1,5 +1,6 @@
 package com.jaywant.Controller;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +30,6 @@ public class AdminController {
     @Autowired
     private EmployeeService empService;
     
-//    @Autowired
-//    private AddEmployee 
-
     @Autowired
     private AttendaceService attService;
 
@@ -43,7 +41,6 @@ public class AdminController {
         return this.empService.addEmp(addEmp);
     }
 
-    // When marking attendance, we use createOrUpdateAttendance so that if an attendance record already exists for the same date, it updates the status.
     @PostMapping("/att")
     public ResponseEntity<Attendance> createOrUpdateAttendance(@RequestBody Attendance attendance) {
         try {
@@ -72,9 +69,7 @@ public class AdminController {
     @GetMapping("/deleteAddEmp/{empId}")
     public void deleteAddEmployee(@PathVariable int empId) {
         this.empService.addEmployeeDelete(empId);
-        System.out.println("deletd sucess" + empId);
-
-        
+        System.out.println("deleted success " + empId);
     }
 
     @GetMapping("/generateReport")
@@ -91,38 +86,38 @@ public class AdminController {
         return attService.getAllAttendance(empId);
     }
 
-    
-    
-    
-    @GetMapping("/getAttendance/{input}")
-    public ResponseEntity<List<Attendance>> getAttendance(@PathVariable String input) {
-        List<Attendance> attendanceList;
-
-        // Check if input is a number (empId) or a name (firstName)
-        if (input.matches("\\d+")) {  // Check if input is a number (empId)
-            int empId = Integer.parseInt(input);
-            attendanceList = attService.getAllAttendance(empId);
-        } else {
-            attendanceList = attService.getAttendanceByEmployeeName(input);
+    // New endpoint: search attendance by employee name.
+    // The path variable "name" will capture the complete string (including spaces).
+    @GetMapping("/getAttendanceByName/{name:.+}")
+    public ResponseEntity<List<Attendance>> getAttendanceByName(@PathVariable("name") String name) {
+        if (name == null || name.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
-
+        String[] parts = name.trim().split("\\s+");
+        List<Attendance> attendanceList;
+        if (parts.length >= 2) {
+            String firstName = parts[0];
+            String lastName = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            attendanceList = attService.getAttendanceByEmployeeName(firstName, lastName);
+        } else {
+            // Fallback: search by first name only.
+            attendanceList = attService.getAttendanceByEmployeeName(parts[0]);
+        }
         if (attendanceList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(attendanceList);
         }
-        
         return ResponseEntity.ok(attendanceList);
     }
 
     @DeleteMapping("/deleteEmp/{empId}")
     public void deleteEmpById(@PathVariable int empId) {
         this.empService.deleteEmpId(empId);
-        System.out.println("deletd sucess" + empId);
+        System.out.println("deleted success " + empId);
     }
 
     @PutMapping("/update/{empId}")
     public AddEmployee updateEmp(@PathVariable int empId, @RequestBody AddEmployee addEmp) {
         return this.empService.updateEmployee(addEmp, empId);
-        
     }
 
     @GetMapping("/getAllSalary")
@@ -130,13 +125,6 @@ public class AdminController {
         return this.salaryService.getAllEmployee();
     }
     
-    @GetMapping("/getAttendanceByName/{firstName}")
-    public ResponseEntity<List<Attendance>> getAttendanceByName(@PathVariable String firstName) {
-        List<Attendance> attendanceList = attService.getAttendanceByEmployeeName(firstName);
-        return ResponseEntity.ok(attendanceList);
-    }
-
-    // Update attendance status for a specific record by its id
     @PutMapping("/updateAttendanceStatus/{id}")
     public ResponseEntity<Attendance> updateAttendanceStatus(
             @PathVariable Long id, 
@@ -149,7 +137,6 @@ public class AdminController {
         }
     }
     
-    // Update attendance status by employee id and date (assumes unique record per employee per date)
     @PutMapping("/updateAttendanceStatusByEmpAndDate/{empId}/{date}/{newStatus}")
     public ResponseEntity<Attendance> updateAttendanceStatusByEmpAndDate(
             @PathVariable int empId,
@@ -164,7 +151,13 @@ public class AdminController {
     }
     
     @GetMapping("/find/{name}")
-    public AddEmployee findByName(@PathVariable String name) {
-    	return this.empService.findByEmployeeName(name);
+    public ResponseEntity<AddEmployee> findByName(@PathVariable String name) {
+        try {
+            AddEmployee employee = this.empService.findByEmployeeName(name);
+            return ResponseEntity.ok(employee);
+        } catch(IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
+
 }
