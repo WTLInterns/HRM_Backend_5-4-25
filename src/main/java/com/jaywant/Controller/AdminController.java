@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,8 @@ import com.jaywant.DTO.SalaryDTO;
 import com.jaywant.Model.AddEmployee;
 import com.jaywant.Model.Attendance;
 import com.jaywant.Service.AttendaceService;
+import com.jaywant.Service.EmployeeEmailService;
+import com.jaywant.Service.EmployeePasswordResetService;
 import com.jaywant.Service.EmployeeService;
 import com.jaywant.Service.SalaryService;
 
@@ -29,18 +32,67 @@ public class AdminController {
 
     @Autowired
     private EmployeeService empService;
-    
+
     @Autowired
     private AttendaceService attService;
 
     @Autowired
     private SalaryService salaryService;
 
+    @Autowired
+    private EmployeeEmailService employeeEmailService;
+
+    @Autowired
+    private EmployeePasswordResetService employeePasswordResetService;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    // -------------------------------
+    // Employee CRUD & Query Endpoints
+    // -------------------------------
+
+    // Add Employee (Admin)
     @PostMapping("/addEmp")
-    public AddEmployee addEmployee(@RequestBody AddEmployee addEmp) {
-        return this.empService.addEmp(addEmp);
+    public ResponseEntity<AddEmployee> addEmployee(@RequestBody AddEmployee addEmp) {
+        AddEmployee newEmployee = empService.addEmp(addEmp);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newEmployee);
     }
 
+    // Get all employees
+    @GetMapping("/getAllEmp")
+    public List<AddEmployee> getAllEmp() {
+        return empService.getAllEmployee();
+    }
+
+    // Find employee by name
+    @GetMapping("/find/{name}")
+    public ResponseEntity<AddEmployee> findByName(@PathVariable String name) {
+        try {
+            AddEmployee employee = empService.findByEmployeeName(name);
+            return ResponseEntity.ok(employee);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    // Update employee by ID
+    @PutMapping("/update/{empId}")
+    public AddEmployee updateEmp(@PathVariable int empId, @RequestBody AddEmployee addEmp) {
+        return empService.updateEmployee(addEmp, empId);
+    }
+
+    // Delete employee by ID (also deletes related attendance records)
+    @DeleteMapping("/deleteEmp/{empId}")
+    public void deleteEmpById(@PathVariable int empId) {
+        empService.deleteEmpId(empId);
+        System.out.println("Deleted successfully: " + empId);
+    }
+
+    // -------------------------------
+    // Attendance Endpoints
+    // -------------------------------
+
+    // Create or update attendance
     @PostMapping("/att")
     public ResponseEntity<Attendance> createOrUpdateAttendance(@RequestBody Attendance attendance) {
         try {
@@ -51,43 +103,24 @@ public class AdminController {
         }
     }
 
+    // Get all attendance records
     @GetMapping("/getAllAtt")
-    public ResponseEntity<List<Attendance>> getAllAttendace() {
+    public ResponseEntity<List<Attendance>> getAllAttendance() {
         try {
             List<Attendance> attendanceList = attService.getAllAttendace();
             return ResponseEntity.ok(attendanceList);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    @GetMapping("/getAllEmp")
-    public List<AddEmployee> getAllEmp(){
-        return this.empService.getAllEmployee();
-    }
-
-    @GetMapping("/deleteAddEmp/{empId}")
-    public void deleteAddEmployee(@PathVariable int empId) {
-        this.empService.addEmployeeDelete(empId);
-        System.out.println("deleted success " + empId);
-    }
-
-    @GetMapping("/generateReport")
-    public SalaryDTO generateSalaryReport(@RequestParam String employeeName,
-                                          @RequestParam String startDate,
-                                          @RequestParam String endDate) {
-        System.out.println("generateReport called with: employeeName=" + employeeName +
-                           ", startDate=" + startDate + ", endDate=" + endDate);
-        return salaryService.generateSalaryReport(employeeName, startDate, endDate);
-    }
-
+    // Get attendance by employee ID
     @GetMapping("/getAllAttendace/{empId}")
     public List<Attendance> getAttendanceByEmployee(@PathVariable int empId) {
         return attService.getAllAttendance(empId);
     }
 
-    // New endpoint: search attendance by employee name.
-    // The path variable "name" will capture the complete string (including spaces).
+    // Search attendance by employee name
     @GetMapping("/getAttendanceByName/{name:.+}")
     public ResponseEntity<List<Attendance>> getAttendanceByName(@PathVariable("name") String name) {
         if (name == null || name.trim().isEmpty()) {
@@ -100,7 +133,6 @@ public class AdminController {
             String lastName = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
             attendanceList = attService.getAttendanceByEmployeeName(firstName, lastName);
         } else {
-            // Fallback: search by first name only.
             attendanceList = attService.getAttendanceByEmployeeName(parts[0]);
         }
         if (attendanceList.isEmpty()) {
@@ -109,26 +141,9 @@ public class AdminController {
         return ResponseEntity.ok(attendanceList);
     }
 
-    @DeleteMapping("/deleteEmp/{empId}")
-    public void deleteEmpById(@PathVariable int empId) {
-        this.empService.deleteEmpId(empId);
-        System.out.println("deleted success " + empId);
-    }
-
-    @PutMapping("/update/{empId}")
-    public AddEmployee updateEmp(@PathVariable int empId, @RequestBody AddEmployee addEmp) {
-        return this.empService.updateEmployee(addEmp, empId);
-    }
-
-    @GetMapping("/getAllSalary")
-    public List<AddEmployee> getAllSalaries() {
-        return this.salaryService.getAllEmployee();
-    }
-    
+    // Update attendance status by attendance ID
     @PutMapping("/updateAttendanceStatus/{id}")
-    public ResponseEntity<Attendance> updateAttendanceStatus(
-            @PathVariable Long id, 
-            @RequestParam String status) {
+    public ResponseEntity<Attendance> updateAttendanceStatus(@PathVariable Long id, @RequestParam String status) {
         try {
             Attendance updatedAttendance = attService.updateAttendanceStatus(id, status);
             return ResponseEntity.ok(updatedAttendance);
@@ -136,12 +151,11 @@ public class AdminController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
+    // Update attendance status by employee ID and date
     @PutMapping("/updateAttendanceStatusByEmpAndDate/{empId}/{date}/{newStatus}")
-    public ResponseEntity<Attendance> updateAttendanceStatusByEmpAndDate(
-            @PathVariable int empId,
-            @PathVariable String date,
-            @PathVariable String newStatus) {
+    public ResponseEntity<Attendance> updateAttendanceStatusByEmpAndDate(@PathVariable int empId,
+            @PathVariable String date, @PathVariable String newStatus) {
         try {
             Attendance updatedAttendance = attService.updateAttendanceStatusByEmployeeAndDate(empId, date, newStatus);
             return ResponseEntity.ok(updatedAttendance);
@@ -149,15 +163,60 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-    
-    @GetMapping("/find/{name}")
-    public ResponseEntity<AddEmployee> findByName(@PathVariable String name) {
+
+    // -------------------------------
+    // Salary Report Endpoint
+    // -------------------------------
+
+    @GetMapping("/generateReport")
+    public SalaryDTO generateSalaryReport(@RequestParam String employeeName,
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        System.out.println("generateReport called with: employeeName=" + employeeName +
+                ", startDate=" + startDate + ", endDate=" + endDate);
+        return salaryService.generateSalaryReport(employeeName, startDate, endDate);
+    }
+
+    // -------------------------------
+    // Employee Forgot Password & Email Endpoints
+    // -------------------------------
+
+    // Request forgot password OTP
+    @PostMapping("/employee/forgot-password/request")
+    public ResponseEntity<String> requestEmployeeForgotPassword(@RequestParam String email) {
         try {
-            AddEmployee employee = this.empService.findByEmployeeName(name);
-            return ResponseEntity.ok(employee);
-        } catch(IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            employeePasswordResetService.sendResetOTP(email);
+            return ResponseEntity.ok("OTP sent to email: " + email);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 
+    // Verify OTP and reset password
+    @PostMapping("/employee/forgot-password/verify")
+    public ResponseEntity<String> verifyEmployeeOtpAndResetPassword(
+            @RequestParam String email,
+            @RequestParam String otp,
+            @RequestParam String newPassword) {
+        if (!employeePasswordResetService.verifyOTP(email, otp)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP");
+        }
+        try {
+            employeePasswordResetService.resetPassword(email, newPassword);
+            return ResponseEntity.ok("Password updated successfully.");
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    // Send employee registration email
+    @PostMapping("/send-email/employee")
+    public ResponseEntity<String> sendEmployeeRegisterEmail(@RequestParam String email) {
+        AddEmployee employee = empService.getEmployeeByEmail(email);
+        if (employee == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+        }
+        employeeEmailService.sendEmployeeCredentials(employee);
+        return ResponseEntity.ok("Employee registration email sent to: " + email);
+    }
 }

@@ -2,67 +2,63 @@ package com.jaywant.Model;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
-public class Employee implements UserDetails{
+@Table(name = "AuthEmployee")
+public class Employee implements UserDetails {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int empId;
-	
+
 	private String firstName;
-	
 	private String lastName;
-	
 	private String email;
-	
 	private String password;
-	
 	private Long phone;
-	
-	public String role;
-	
+	private String role;
 	private String aadharNo;
-    private String panCard;
-    private String education;
-    private String bloodGroup;
-    private String jobRole;
-    private String gender;
-    private String address;
-    private String birthDate;
-    private String joiningDate;
-    private String status;
-    private String bankName;
-    private Long bankAccountNo;
-    private String bankIfscCode;
-    private String branchName;
-    private Long salary;
-    
-    
-	
+	private String panCard;
+	private String education;
+	private String bloodGroup;
+	private String jobRole;
+	private String gender;
+	private String address;
+	private String birthDate;
+	private String joiningDate;
+	private String status;
+	private String bankName;
+	private Long bankAccountNo;
+	private String bankIfscCode;
+	private String branchName;
+	private Long salary;
+
 	public Employee() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	
+	private String company;
+
+	public String getCompany() {
+		return company;
+	}
+
+	public void setCompany(String company) {
+		this.company = company;
+	}
 
 	public Employee(int empId, String firstName, String lastName, String email, String password, Long phone,
 			String role, String aadharNo, String panCard, String education, String bloodGroup, String jobRole,
 			String gender, String address, String birthDate, String joiningDate, String status, String bankName,
-			Long bankAccountNo, String bankIfscCode, String branchName, Long salary) {
+			Long bankAccountNo, String bankIfscCode, String branchName, Long salary, String company) {
 		super();
 		this.empId = empId;
 		this.firstName = firstName;
@@ -86,24 +82,7 @@ public class Employee implements UserDetails{
 		this.bankIfscCode = bankIfscCode;
 		this.branchName = branchName;
 		this.salary = salary;
-	}
-
-
-
-	public int getEmployeeId() {
-		return empId;
-	}
-
-	public void setEmpoyeeId(int empId) {
-		this.empId = empId;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+		this.company = company;
 	}
 
 	public String getLastName() {
@@ -122,15 +101,9 @@ public class Employee implements UserDetails{
 		this.email = email;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
-	
 
 	public Long getPhone() {
 		return phone;
@@ -138,26 +111,6 @@ public class Employee implements UserDetails{
 
 	public void setPhone(Long phone) {
 		this.phone = phone;
-	}
-	
-	
-	
-	
-
-	
-	
-	
-
-	
-
-	
-
-	public int getEmpId() {
-		return empId;
-	}
-
-	public void setEmpId(int empId) {
-		this.empId = empId;
 	}
 
 	public String getAadharNo() {
@@ -280,6 +233,26 @@ public class Employee implements UserDetails{
 		this.salary = salary;
 	}
 
+	// Consistent getters and setters for empId
+	public int getEmpId() {
+		return empId;
+	}
+
+	public void setEmpId(int empId) {
+		this.empId = empId;
+	}
+
+	// Other getters and setters...
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	// ... (include getters and setters for all fields)
+
 	public String getRole() {
 		return role;
 	}
@@ -288,9 +261,10 @@ public class Employee implements UserDetails{
 		this.role = role;
 	}
 
+	// UserDetails methods
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority("EMPLOYEE"));
+		return List.of(new SimpleGrantedAuthority(role));
 	}
 
 	@Override
@@ -298,7 +272,30 @@ public class Employee implements UserDetails{
 		return email;
 	}
 
-	
-	
-	
+	// Use the standard getter name for password
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	// Other methods from UserDetails
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
 }
