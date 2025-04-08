@@ -6,16 +6,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.jaywant.Repo.EmployeeRepo;
+import com.jaywant.Model.AddEmployee;
+import com.jaywant.Repo.AddEmployeeRepo;
 
 @Service
-public class EmployeeDetailsServiceImpl  implements UserDetailsService{
-	
-	
+public class EmployeeDetailsServiceImpl implements UserDetailsService {
+
 	@Autowired
-	private EmployeeRepo userRepo;
+	private AddEmployeeRepo userRepo;
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return userRepo.findByEmail(username);
+		AddEmployee user = userRepo.findByEmail(username);
+		if (user == null) {
+			throw new UsernameNotFoundException("User not found with email: " + username);
+		}
+		return user;
 	}
 }

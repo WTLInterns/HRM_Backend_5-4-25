@@ -1,28 +1,28 @@
 package com.jaywant.DTO;
 
 import com.jaywant.Model.Attendance;
-import com.jaywant.Model.Employee;
+import com.jaywant.Model.AddEmployee;
 import java.util.List;
 
 public class EmployeeWithAttendanceDTO {
-  private Employee employee;
+  private AddEmployee employee;
   private List<Attendance> attendanceList;
 
   // Constructors
   public EmployeeWithAttendanceDTO() {
   }
 
-  public EmployeeWithAttendanceDTO(Employee employee, List<Attendance> attendanceList) {
+  public EmployeeWithAttendanceDTO(AddEmployee employee, List<Attendance> attendanceList) {
     this.employee = employee;
     this.attendanceList = attendanceList;
   }
 
   // Getters and Setters
-  public Employee getEmployee() {
+  public AddEmployee getEmployee() {
     return employee;
   }
 
-  public void setEmployee(Employee employee) {
+  public void setEmployee(AddEmployee employee) {
     this.employee = employee;
   }
 

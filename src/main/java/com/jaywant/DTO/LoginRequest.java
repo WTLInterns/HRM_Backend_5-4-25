@@ -2,7 +2,7 @@ package com.jaywant.DTO;
 
 import java.util.List;
 
-import com.jaywant.Model.Employee;
+import com.jaywant.Model.AddEmployee;
 
 
 public class LoginRequest {

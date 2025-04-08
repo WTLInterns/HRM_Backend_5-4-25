@@ -1,301 +1,317 @@
-package com.jaywant.Model;
+// package com.jaywant.Model;
 
-import java.util.Collection;
-import java.util.List;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+// import java.util.Collection;
+// import java.util.List;
+// import org.springframework.security.core.GrantedAuthority;
+// import org.springframework.security.core.authority.SimpleGrantedAuthority;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import jakarta.persistence.Entity;
+// import jakarta.persistence.GeneratedValue;
+// import jakarta.persistence.GenerationType;
+// import jakarta.persistence.Id;
+// import jakarta.persistence.Table;
+// import jakarta.persistence.Transient;
 
-@Entity
-@Table(name = "AuthEmployee")
-public class Employee implements UserDetails {
+// @Entity
+// @Table(name = "AuthEmployee")
+// public class Employee implements UserDetails {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private int empId;
+// @Id
+// @GeneratedValue(strategy = GenerationType.AUTO)
+// private int empId;
 
-	private String firstName;
-	private String lastName;
-	private String email;
-	private String password;
-	private Long phone;
-	private String role;
-	private String aadharNo;
-	private String panCard;
-	private String education;
-	private String bloodGroup;
-	private String jobRole;
-	private String gender;
-	private String address;
-	private String birthDate;
-	private String joiningDate;
-	private String status;
-	private String bankName;
-	private Long bankAccountNo;
-	private String bankIfscCode;
-	private String branchName;
-	private Long salary;
+// private String firstName;
+// private String lastName;
+// private String email;
+// private String password;
+// private Long phone;
+// private String role;
+// private String aadharNo;
+// private String panCard;
+// private String education;
+// private String bloodGroup;
+// private String jobRole;
+// private String gender;
+// private String address;
+// private String birthDate;
+// private String joiningDate;
+// private String status;
+// private String bankName;
+// private String bankAccountNo;
+// private String bankIfscCode;
+// private String branchName;
+// private Long salary;
 
-	public Employee() {
-		super();
-	}
+// @Transient // Prevents JPA from treating this as a DB column
+// private AddSubAdmin addSubAdmin;
 
-	private String company;
+// public AddSubAdmin getAddSubAdmin() {
+// return addSubAdmin;
+// }
 
-	public String getCompany() {
-		return company;
-	}
+// public void setAddSubAdmin(AddSubAdmin addSubAdmin) {
+// this.addSubAdmin = addSubAdmin;
+// }
 
-	public void setCompany(String company) {
-		this.company = company;
-	}
+// public Employee() {
+// super();
+// }
 
-	public Employee(int empId, String firstName, String lastName, String email, String password, Long phone,
-			String role, String aadharNo, String panCard, String education, String bloodGroup, String jobRole,
-			String gender, String address, String birthDate, String joiningDate, String status, String bankName,
-			Long bankAccountNo, String bankIfscCode, String branchName, Long salary, String company) {
-		super();
-		this.empId = empId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.password = password;
-		this.phone = phone;
-		this.role = role;
-		this.aadharNo = aadharNo;
-		this.panCard = panCard;
-		this.education = education;
-		this.bloodGroup = bloodGroup;
-		this.jobRole = jobRole;
-		this.gender = gender;
-		this.address = address;
-		this.birthDate = birthDate;
-		this.joiningDate = joiningDate;
-		this.status = status;
-		this.bankName = bankName;
-		this.bankAccountNo = bankAccountNo;
-		this.bankIfscCode = bankIfscCode;
-		this.branchName = branchName;
-		this.salary = salary;
-		this.company = company;
-	}
+// private String company;
 
-	public String getLastName() {
-		return lastName;
-	}
+// public String getCompany() {
+// return company;
+// }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+// public void setCompany(String company) {
+// this.company = company;
+// }
 
-	public String getEmail() {
-		return email;
-	}
+// public Employee(int empId, String firstName, String lastName, String email,
+// String password, Long phone,
+// String role, String aadharNo, String panCard, String education, String
+// bloodGroup, String jobRole,
+// String gender, String address, String birthDate, String joiningDate, String
+// status, String bankName,
+// String bankAccountNo, String bankIfscCode, String branchName, Long salary,
+// String company) {
+// super();
+// this.empId = empId;
+// this.firstName = firstName;
+// this.lastName = lastName;
+// this.email = email;
+// this.password = password;
+// this.phone = phone;
+// this.role = role;
+// this.aadharNo = aadharNo;
+// this.panCard = panCard;
+// this.education = education;
+// this.bloodGroup = bloodGroup;
+// this.jobRole = jobRole;
+// this.gender = gender;
+// this.address = address;
+// this.birthDate = birthDate;
+// this.joiningDate = joiningDate;
+// this.status = status;
+// this.bankName = bankName;
+// this.bankAccountNo = bankAccountNo;
+// this.bankIfscCode = bankIfscCode;
+// this.branchName = branchName;
+// this.salary = salary;
+// this.company = company;
+// }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+// public String getLastName() {
+// return lastName;
+// }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+// public void setLastName(String lastName) {
+// this.lastName = lastName;
+// }
 
-	public Long getPhone() {
-		return phone;
-	}
+// public String getEmail() {
+// return email;
+// }
 
-	public void setPhone(Long phone) {
-		this.phone = phone;
-	}
+// public void setEmail(String email) {
+// this.email = email;
+// }
 
-	public String getAadharNo() {
-		return aadharNo;
-	}
+// public void setPassword(String password) {
+// this.password = password;
+// }
 
-	public void setAadharNo(String aadharNo) {
-		this.aadharNo = aadharNo;
-	}
+// public Long getPhone() {
+// return phone;
+// }
 
-	public String getPanCard() {
-		return panCard;
-	}
+// public void setPhone(Long phone) {
+// this.phone = phone;
+// }
 
-	public void setPanCard(String panCard) {
-		this.panCard = panCard;
-	}
+// public String getAadharNo() {
+// return aadharNo;
+// }
 
-	public String getEducation() {
-		return education;
-	}
+// public void setAadharNo(String aadharNo) {
+// this.aadharNo = aadharNo;
+// }
 
-	public void setEducation(String education) {
-		this.education = education;
-	}
+// public String getPanCard() {
+// return panCard;
+// }
 
-	public String getBloodGroup() {
-		return bloodGroup;
-	}
+// public void setPanCard(String panCard) {
+// this.panCard = panCard;
+// }
 
-	public void setBloodGroup(String bloodGroup) {
-		this.bloodGroup = bloodGroup;
-	}
+// public String getEducation() {
+// return education;
+// }
 
-	public String getJobRole() {
-		return jobRole;
-	}
+// public void setEducation(String education) {
+// this.education = education;
+// }
 
-	public void setJobRole(String jobRole) {
-		this.jobRole = jobRole;
-	}
+// public String getBloodGroup() {
+// return bloodGroup;
+// }
 
-	public String getGender() {
-		return gender;
-	}
+// public void setBloodGroup(String bloodGroup) {
+// this.bloodGroup = bloodGroup;
+// }
 
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
+// public String getJobRole() {
+// return jobRole;
+// }
 
-	public String getAddress() {
-		return address;
-	}
+// public void setJobRole(String jobRole) {
+// this.jobRole = jobRole;
+// }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+// public String getGender() {
+// return gender;
+// }
 
-	public String getBirthDate() {
-		return birthDate;
-	}
+// public void setGender(String gender) {
+// this.gender = gender;
+// }
 
-	public void setBirthDate(String birthDate) {
-		this.birthDate = birthDate;
-	}
+// public String getAddress() {
+// return address;
+// }
 
-	public String getJoiningDate() {
-		return joiningDate;
-	}
+// public void setAddress(String address) {
+// this.address = address;
+// }
 
-	public void setJoiningDate(String joiningDate) {
-		this.joiningDate = joiningDate;
-	}
+// public String getBirthDate() {
+// return birthDate;
+// }
 
-	public String getStatus() {
-		return status;
-	}
+// public void setBirthDate(String birthDate) {
+// this.birthDate = birthDate;
+// }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+// public String getJoiningDate() {
+// return joiningDate;
+// }
 
-	public String getBankName() {
-		return bankName;
-	}
+// public void setJoiningDate(String joiningDate) {
+// this.joiningDate = joiningDate;
+// }
 
-	public void setBankName(String bankName) {
-		this.bankName = bankName;
-	}
+// public String getStatus() {
+// return status;
+// }
 
-	public Long getBankAccountNo() {
-		return bankAccountNo;
-	}
+// public void setStatus(String status) {
+// this.status = status;
+// }
 
-	public void setBankAccountNo(Long bankAccountNo) {
-		this.bankAccountNo = bankAccountNo;
-	}
+// public String getBankName() {
+// return bankName;
+// }
 
-	public String getBankIfscCode() {
-		return bankIfscCode;
-	}
+// public void setBankName(String bankName) {
+// this.bankName = bankName;
+// }
 
-	public void setBankIfscCode(String bankIfscCode) {
-		this.bankIfscCode = bankIfscCode;
-	}
+// public String getBankAccountNo() {
+// return bankAccountNo;
+// }
 
-	public String getBranchName() {
-		return branchName;
-	}
+// public void setBankAccountNo(String bankAccountNo) {
+// this.bankAccountNo = bankAccountNo;
+// }
 
-	public void setBranchName(String branchName) {
-		this.branchName = branchName;
-	}
+// public String getBankIfscCode() {
+// return bankIfscCode;
+// }
 
-	public Long getSalary() {
-		return salary;
-	}
+// public void setBankIfscCode(String bankIfscCode) {
+// this.bankIfscCode = bankIfscCode;
+// }
 
-	public void setSalary(Long salary) {
-		this.salary = salary;
-	}
+// public String getBranchName() {
+// return branchName;
+// }
 
-	// Consistent getters and setters for empId
-	public int getEmpId() {
-		return empId;
-	}
+// public void setBranchName(String branchName) {
+// this.branchName = branchName;
+// }
 
-	public void setEmpId(int empId) {
-		this.empId = empId;
-	}
+// public Long getSalary() {
+// return salary;
+// }
 
-	// Other getters and setters...
-	public String getFirstName() {
-		return firstName;
-	}
+// public void setSalary(Long salary) {
+// this.salary = salary;
+// }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+// // Consistent getters and setters for empId
+// public int getEmpId() {
+// return empId;
+// }
 
-	// ... (include getters and setters for all fields)
+// public void setEmpId(int empId) {
+// this.empId = empId;
+// }
 
-	public String getRole() {
-		return role;
-	}
+// // Other getters and setters...
+// public String getFirstName() {
+// return firstName;
+// }
 
-	public void setRole(String role) {
-		this.role = role;
-	}
+// public void setFirstName(String firstName) {
+// this.firstName = firstName;
+// }
 
-	// UserDetails methods
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority(role));
-	}
+// // ... (include getters and setters for all fields)
 
-	@Override
-	public String getUsername() {
-		return email;
-	}
+// public String getRole() {
+// return role;
+// }
 
-	// Use the standard getter name for password
-	@Override
-	public String getPassword() {
-		return password;
-	}
+// public void setRole(String role) {
+// this.role = role;
+// }
 
-	// Other methods from UserDetails
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
+// // UserDetails methods
+// @Override
+// public Collection<? extends GrantedAuthority> getAuthorities() {
+// return List.of(new SimpleGrantedAuthority(role));
+// }
 
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
+// @Override
+// public String getUsername() {
+// return email;
+// }
 
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
+// // Use the standard getter name for password
+// @Override
+// public String getPassword() {
+// return password;
+// }
 
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-}
+// // Other methods from UserDetails
+// @Override
+// public boolean isAccountNonExpired() {
+// return true;
+// }
+
+// @Override
+// public boolean isAccountNonLocked() {
+// return true;
+// }
+
+// @Override
+// public boolean isCredentialsNonExpired() {
+// return true;
+// }
+
+// @Override
+// public boolean isEnabled() {
+// return true;
+// }
+// }

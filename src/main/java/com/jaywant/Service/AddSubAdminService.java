@@ -3,11 +3,10 @@ package com.jaywant.Service;
 import com.jaywant.DTO.EmployeeWithAttendanceDTO;
 import com.jaywant.Model.AddSubAdmin;
 import com.jaywant.Model.Attendance;
-import com.jaywant.Model.Employee;
+import com.jaywant.Model.AddEmployee;
 import com.jaywant.Repo.AddSubAdminRepository;
 import com.jaywant.Repo.AttendanceRepo;
-import com.jaywant.Repo.EmployeeRepo;
-
+import com.jaywant.Repo.AddEmployeeRepo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -118,7 +117,6 @@ public class AddSubAdminService {
       String defaultPassword = "subAdmin@123";
       subAdmin.setPassword(defaultPassword); // So plain password is passed in email
       mailService.sendSubAdminCredentials(subAdmin);
-
       return true;
     }
     return false;
@@ -140,18 +138,18 @@ public class AddSubAdminService {
   }
 
   @Autowired
-  private EmployeeRepo employeeRepo;
+  private AddEmployeeRepo addEmployeeRepo;
 
   @Autowired
   private AttendanceRepo attendanceRepo;
 
+  // Now using AddEmployee everywhere
   public List<EmployeeWithAttendanceDTO> getEmployeesWithAttendanceByCompany(String companyName) {
-    List<Employee> employees = employeeRepo.findByCompany(companyName);
+    List<AddEmployee> employees = addEmployeeRepo.findByCompany(companyName);
     List<EmployeeWithAttendanceDTO> result = new ArrayList<>();
 
-    for (Employee emp : employees) {
+    for (AddEmployee emp : employees) {
       List<Attendance> attendanceList = attendanceRepo.findByEmployeeEmpId(emp.getEmpId());
-
       result.add(new EmployeeWithAttendanceDTO(emp, attendanceList));
     }
 

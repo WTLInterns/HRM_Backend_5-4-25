@@ -1,14 +1,5 @@
 package com.jaywant.Controller;
 
-import com.jaywant.DTO.EmployeeWithAttendanceDTO;
-import com.jaywant.Model.AddSubAdmin;
-import com.jaywant.Model.Attendance;
-import com.jaywant.Model.Employee;
-import com.jaywant.Repo.AttendanceRepo;
-import com.jaywant.Repo.EmployeeRepo;
-import com.jaywant.Service.AddSubAdminService;
-import com.jaywant.Service.SubAdminPasswordResetService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +18,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jaywant.DTO.EmployeeWithAttendanceDTO;
+import com.jaywant.Model.AddSubAdmin;
+import com.jaywant.Model.Attendance;
+import com.jaywant.Model.AddEmployee;
 import com.jaywant.Repo.AddSubAdminRepository;
+import com.jaywant.Repo.AttendanceRepo;
+import com.jaywant.Repo.AddEmployeeRepo;
+import com.jaywant.Service.AddSubAdminService;
+import com.jaywant.Service.SubAdminPasswordResetService;
 
 @RestController
 @RequestMapping("/api/subadmin")
@@ -89,7 +88,8 @@ public class SubAdminController {
     if (sent) {
       return ResponseEntity.ok("Email sent successfully to " + subadminemail);
     } else {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("SubAdmin with email " + subadminemail + " not found.");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body("SubAdmin with email " + subadminemail + " not found.");
     }
   }
 
@@ -155,8 +155,9 @@ public class SubAdminController {
     }
   }
 
+  // Use AddEmployeeRepo instead of EmployeeRepo for retrieving employee records.
   @Autowired
-  private EmployeeRepo employeeRepo;
+  private AddEmployeeRepo addEmployeeRepo;
 
   @Autowired
   private AttendanceRepo attendanceRepo;
@@ -168,31 +169,29 @@ public class SubAdminController {
   public ResponseEntity<?> getEmployeesWithAttendanceByCompany(
       @PathVariable("registercompanyname") String companyName) {
 
-    // First, try to find employees with the given company name
-    List<Employee> employees = employeeRepo.findByCompany(companyName);
+    // First, try to find employees with the given company name using
+    // AddEmployeeRepo.
+    List<AddEmployee> employees = addEmployeeRepo.findByCompany(companyName);
 
     if (!employees.isEmpty()) {
       List<EmployeeWithAttendanceDTO> result = new ArrayList<>();
-      for (Employee emp : employees) {
+      for (AddEmployee emp : employees) {
         List<Attendance> attendanceList = attendanceRepo.findByEmployeeEmpId(emp.getEmpId());
         result.add(new EmployeeWithAttendanceDTO(emp, attendanceList));
       }
       return ResponseEntity.ok(result);
     }
 
+    // If no employees found, try to find sub-admins for the company.
     List<AddSubAdmin> subAdmins = addSubAdminRepo.findByRegistercompanyname(companyName);
     if (!subAdmins.isEmpty()) {
       // Company exists but no employees
-      return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
           .body("⚠️ No employees found for company: " + companyName + ". Please add employees first.");
     } else {
       // Company doesn't exist
-      return ResponseEntity
-          .status(HttpStatus.NOT_FOUND)
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body("❌ No company found with name: " + companyName + ". Please register the company first.");
     }
-
   }
-
 }

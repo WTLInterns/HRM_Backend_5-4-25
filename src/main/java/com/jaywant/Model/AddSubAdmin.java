@@ -1,9 +1,12 @@
 package com.jaywant.Model;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,7 +26,10 @@ public class AddSubAdmin {
   private String password;
   private String registercompanyname;
   private String companylogo;
-  
+  private String role = "SUB_ADMIN";
+
+  @OneToMany(mappedBy = "addSubAdmin")
+  private List<AddEmployee> employees;
 
   public int getId() {
     return id;
@@ -105,6 +111,22 @@ public class AddSubAdmin {
     this.companylogo = companylogo;
   }
 
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
+  }
+
   // Getters and Setters
+
+  public List<AddEmployee> getEmployees() {
+    return employees;
+  }
+
+  public void setEmployees(List<AddEmployee> employees) {
+    this.employees = employees;
+  }
 
 }

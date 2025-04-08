@@ -1,18 +1,16 @@
 package com.jaywant.Model;
 
+import java.util.Collection;
 import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import com.jaywant.Model.Attendance; // Ensure Attendance is imported
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Employee")
-public class AddEmployee {
+public class AddEmployee implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,24 +36,26 @@ public class AddEmployee {
     private String branchName;
     private Long salary;
     private String password;
-
-    // This field represents the company that owns this employee.
+    private String roll = "EMPLOYEE";
     private String company;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "employee")
+    @ManyToOne
+    private AddSubAdmin addSubAdmin;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attendance> attendance;
 
     public AddEmployee() {
-        super();
+        // Default constructor
     }
 
     public AddEmployee(int empId, String firstName, String lastName, String email, Long phone, String aadharNo,
-            String panCard, String education, String bloodGroup, String jobRole, String gender, String address,
-            String birthDate, String joiningDate, String status, String bankName, String bankAccountNo,
-            String bankIfscCode, String branchName, Long salary, List<Attendance> attendance, String company,
-            String password) {
-        super();
+            String panCard, String education, String bloodGroup, String jobRole, String gender,
+            String address, String birthDate, String joiningDate, String status, String bankName,
+            String bankAccountNo, String bankIfscCode, String branchName, Long salary, String password,
+            String company, List<Attendance> attendance) {
         this.empId = empId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -76,9 +76,9 @@ public class AddEmployee {
         this.bankIfscCode = bankIfscCode;
         this.branchName = branchName;
         this.salary = salary;
-        this.attendance = attendance;
-        this.company = company;
         this.password = password;
+        this.company = company;
+        this.attendance = attendance;
     }
 
     // Getters and setters
@@ -96,24 +96,6 @@ public class AddEmployee {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
-    }
-
-    // ... Other getters and setters for each field ...
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
     }
 
     public String getLastName() {
@@ -260,6 +242,38 @@ public class AddEmployee {
         this.salary = salary;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRoll() {
+        return roll;
+    }
+
+    public void setRoll(String roll) {
+        this.roll = roll;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public AddSubAdmin getAddSubAdmin() {
+        return addSubAdmin;
+    }
+
+    public void setAddSubAdmin(AddSubAdmin addSubAdmin) {
+        this.addSubAdmin = addSubAdmin;
+    }
+
     public List<Attendance> getAttendance() {
         return attendance;
     }
@@ -268,6 +282,34 @@ public class AddEmployee {
         this.attendance = attendance;
     }
 
-    // Include remaining getters and setters as needed.
-    
+    // --- UserDetails interface methods ---
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(roll));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
