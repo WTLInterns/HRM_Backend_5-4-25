@@ -1,12 +1,5 @@
 package com.jaywant.Service;
 
-import com.jaywant.DTO.EmployeeWithAttendanceDTO;
-import com.jaywant.Model.AddSubAdmin;
-import com.jaywant.Model.Attendance;
-import com.jaywant.Model.AddEmployee;
-import com.jaywant.Repo.AddSubAdminRepository;
-import com.jaywant.Repo.AttendanceRepo;
-import com.jaywant.Repo.AddEmployeeRepo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,10 +8,19 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.jaywant.DTO.EmployeeWithAttendanceDTO;
+import com.jaywant.Model.AddEmployee;
+import com.jaywant.Model.AddSubAdmin;
+import com.jaywant.Model.Attendance;
+import com.jaywant.Repo.AddEmployeeRepo;
+import com.jaywant.Repo.AddSubAdminRepository;
+import com.jaywant.Repo.AttendanceRepo;
 
 @Service
 public class AddSubAdminService {
@@ -90,6 +92,37 @@ public class AddSubAdminService {
       e.printStackTrace();
     }
     return fileName;
+  }
+
+  public AddSubAdmin updateSubAdminFields(int id, String name, String lastname, String email, String phoneno,
+      String registercompanyname, MultipartFile stampImg, MultipartFile signature,
+      MultipartFile companylogo) {
+
+    AddSubAdmin subAdmin = repo.findById(id)
+        .orElseThrow(() -> new RuntimeException("SubAdmin with ID " + id + " not found."));
+
+    subAdmin.setName(name);
+    subAdmin.setLastname(lastname);
+    subAdmin.setEmail(email);
+    subAdmin.setPhoneno(phoneno);
+    subAdmin.setRegistercompanyname(registercompanyname);
+
+    if (stampImg != null && !stampImg.isEmpty()) {
+      String stampImgFileName = saveFile(stampImg);
+      subAdmin.setStampImg(stampImgFileName);
+    }
+
+    if (signature != null && !signature.isEmpty()) {
+      String signatureFileName = saveFile(signature);
+      subAdmin.setSignature(signatureFileName);
+    }
+
+    if (companylogo != null && !companylogo.isEmpty()) {
+      String logoFileName = saveFile(companylogo);
+      subAdmin.setCompanylogo(logoFileName);
+    }
+
+    return repo.save(subAdmin);
   }
 
   public AddSubAdmin login(String email, String password) {

@@ -13,18 +13,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jaywant.DTO.EmployeeWithAttendanceDTO;
+import com.jaywant.DTO.LoginRequest;
+import com.jaywant.Model.AddEmployee;
 import com.jaywant.Model.AddSubAdmin;
 import com.jaywant.Model.Attendance;
-import com.jaywant.Model.AddEmployee;
+import com.jaywant.Repo.AddEmployeeRepo;
 import com.jaywant.Repo.AddSubAdminRepository;
 import com.jaywant.Repo.AttendanceRepo;
-import com.jaywant.Repo.AddEmployeeRepo;
 import com.jaywant.Service.AddSubAdminService;
 import com.jaywant.Service.SubAdminPasswordResetService;
 
@@ -66,10 +68,24 @@ public class SubAdminController {
     }
   }
 
+  // @PostMapping("/login")
+  // public ResponseEntity<?> login(@RequestParam String email, @RequestParam
+  // String password) {
+  // AddSubAdmin user = service.login(email, password);
+  // if (user != null) {
+  // return ResponseEntity.ok(user);
+  // }
+  // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or
+  // password");
+  // }
+
   @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestParam String email, @RequestParam String password) {
-    AddSubAdmin user = service.login(email, password);
+  public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    AddSubAdmin user = service.login(loginRequest.getEmail(), loginRequest.getPassword());
     if (user != null) {
+      // Create a response with token if needed
+      loginRequest.setRole("SUB_ADMIN"); // Set the role
+      // You can set token here if you're using JWT or other token-based auth
       return ResponseEntity.ok(user);
     }
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
@@ -194,4 +210,26 @@ public class SubAdminController {
           .body("❌ No company found with name: " + companyName + ". Please register the company first.");
     }
   }
+
+  @PutMapping("/update-fields/{id}")
+  public ResponseEntity<?> updateSubAdminFields(
+      @PathVariable int id,
+      @RequestParam String name,
+      @RequestParam String lastname,
+      @RequestParam String email,
+      @RequestParam String phoneno,
+      @RequestParam String registercompanyname,
+      @RequestParam(value = "stampImg", required = false) MultipartFile stampImg,
+      @RequestParam(value = "signature", required = false) MultipartFile signature,
+      @RequestParam(value = "companylogo", required = false) MultipartFile companylogo) {
+
+    try {
+      AddSubAdmin updated = service.updateSubAdminFields(id, name, lastname, email, phoneno, registercompanyname,
+          stampImg, signature, companylogo);
+      return ResponseEntity.ok(updated);
+    } catch (RuntimeException ex) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+  }
+
 }

@@ -138,6 +138,36 @@ public class SecurityConfig {
 				.authorizeHttpRequests(auth -> auth
 						// Public endpoints for AdminController
 						.requestMatchers(
+								"/admin/register",
+								"/admin/login",
+								"/admin/update",
+								"/admin/forgot-password/request",
+								"/admin/forgot-password/verify")
+						.permitAll()
+
+						// Existing public endpoints for EmployeeController
+						.requestMatchers(
+								"/employee/register",
+								"/employee/login")
+						.permitAll()
+
+						// Existing public endpoints for SubAdminController
+						.requestMatchers(
+								"/api/subadmin/create",
+								"/api/subadmin/login",
+								"/api/subadmin/update-password/**",
+								"/api/subadmin/send-email/**",
+								"/api/subadmin/all",
+								"/api/subadmin/subadminbygamil/**",
+								"/api/subadmin/delete/**",
+								"/api/subadmin/forgot-password/request",
+								"/api/subadmin/forgot-password/verify",
+								"/api/subadmin/update-fields/**",
+								"/api/subadmin/by-company/**")
+						.permitAll()
+
+						// Public endpoints for /public/** remain unchanged
+						.requestMatchers(
 								"/public/addEmp",
 								"/public/getAllEmp",
 								"/public/find/**",
@@ -153,26 +183,6 @@ public class SecurityConfig {
 								"/public/employee/forgot-password/request",
 								"/public/employee/forgot-password/verify",
 								"public/send-email/employee")
-						.permitAll()
-
-						// Public endpoints for EmployeeController
-						.requestMatchers(
-								"/employee/register",
-								"/employee/login")
-						.permitAll()
-
-						// Public endpoints for SubAdminController
-						.requestMatchers(
-								"/api/subadmin/create",
-								"/api/subadmin/login",
-								"/api/subadmin/update-password/**",
-								"/api/subadmin/send-email/**",
-								"/api/subadmin/all",
-								"/api/subadmin/subadminbygamil/**",
-								"/api/subadmin/delete/**",
-								"/api/subadmin/forgot-password/request",
-								"/api/subadmin/forgot-password/verify",
-								"/api/subadmin/by-company/**")
 						.permitAll()
 
 						// All other requests require authentication
