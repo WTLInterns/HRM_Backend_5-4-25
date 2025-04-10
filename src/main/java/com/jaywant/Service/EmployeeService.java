@@ -1,20 +1,20 @@
 package com.jaywant.Service;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.jaywant.Model.AddEmployee;
 import com.jaywant.Model.AddSubAdmin;
 import com.jaywant.Model.Attendance;
 import com.jaywant.Repo.AddEmployeeRepo;
 import com.jaywant.Repo.AttendanceRepo;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class EmployeeService {
@@ -32,34 +32,36 @@ public class EmployeeService {
     private EmployeeEmailService employeeEmailService;
 
     /**
-     * Registers an employee for authentication and creates an associated
-     * AddEmployee record.
-     * Generates a default password using the employee's first name.
+     * Registers an employee and creates an AddEmployee record.
+     * If no password is provided, a default password is generated as
+     * "<firstName>@123".
      */
     public Map<String, Object> registerEmployee(@RequestBody AddEmployee employee) {
         Map<String, Object> response = new HashMap<>();
 
-        // Generate default password (e.g., "Alice@123")
-        String defaultPassword = employee.getFirstName() + "@123";
-        String encodedPassword = passwordEncoder.encode(defaultPassword);
-        employee.setPassword(encodedPassword);
+        // Generate default password if none provided
+        if (employee.getPassword() == null || employee.getPassword().trim().isEmpty()) {
+            String defaultPassword = employee.getFirstName().trim() + "@123";
+            String encodedPassword = passwordEncoder.encode(defaultPassword);
+            employee.setPassword(encodedPassword);
+            response.put("defaultPassword", defaultPassword);
+        } else {
+            employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+        }
 
         // Save the employee record
         AddEmployee savedEmployee = addEmpRepo.save(employee);
 
-        // Optionally, send an email with the default password
+        // Optionally send a welcome email with the default password
         employeeEmailService.sendEmployeeCredentials(savedEmployee);
 
         response.put("user", savedEmployee);
-        response.put("defaultPassword", defaultPassword);
         response.put("status", "success");
         return response;
     }
 
     /**
      * Authenticates an employee using their email and password.
-     * Returns a map with employee details, sub-admin info (if available), and a
-     * message.
      */
     public Map<String, Object> login(String email, String password) {
         Map<String, Object> response = new HashMap<>();
@@ -69,7 +71,6 @@ public class EmployeeService {
             return response;
         }
         if (passwordEncoder.matches(password, emp.getPassword())) {
-            // Add employee details to the response
             response.put("empId", emp.getEmpId());
             response.put("firstName", emp.getFirstName());
             response.put("lastName", emp.getLastName());
@@ -109,7 +110,6 @@ public class EmployeeService {
             } else {
                 response.put("subAdmin", "Not Assigned");
             }
-
             response.put("message", "Login successful");
         } else {
             response.put("message", "Invalid credentials");
@@ -130,7 +130,7 @@ public class EmployeeService {
     }
 
     /**
-     * Retrieves the profile for an employee using their email.
+     * Retrieves an employee by email.
      */
     public AddEmployee profile(String email) {
         return addEmpRepo.findByEmail(email);
@@ -141,6 +141,13 @@ public class EmployeeService {
     // -----------------------------
 
     public AddEmployee addEmp(AddEmployee addEmp) {
+        // Auto-generate default password if none is provided.
+        if (addEmp.getPassword() == null || addEmp.getPassword().trim().isEmpty()) {
+            String defaultPassword = addEmp.getFirstName().trim() + "@123";
+            addEmp.setPassword(passwordEncoder.encode(defaultPassword));
+        } else {
+            addEmp.setPassword(passwordEncoder.encode(addEmp.getPassword()));
+        }
         return addEmpRepo.save(addEmp);
     }
 
@@ -161,7 +168,7 @@ public class EmployeeService {
     }
 
     /**
-     * Deletes attendance records associated with an employee, then deletes the
+     * Deletes all attendance records associated with an employee, then deletes the
      * employee record.
      */
     public void deleteEmpId(int empId) {
@@ -178,20 +185,22 @@ public class EmployeeService {
     }
 
     /**
-     * Finds an employee record by name.
+     * Finds an employee record by full name.
+     * Splits a name like "Pranav Paul" into firstName and lastName (both trimmed).
      */
     public AddEmployee findByEmployeeName(String name) {
         String[] parts = name.trim().split("\\s+");
         AddEmployee employee = null;
         if (parts.length >= 2) {
-            String firstName = parts[0];
-            String lastName = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            // Trim each part individually.
+            String firstName = parts[0].trim();
+            String lastName = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length)).trim();
             employee = addEmpRepo.findByFirstNameAndLastName(firstName, lastName);
             if (employee == null) {
                 employee = addEmpRepo.findByFirstName(firstName);
             }
         } else {
-            employee = addEmpRepo.findByFirstName(name);
+            employee = addEmpRepo.findByFirstName(name.trim());
         }
         if (employee == null) {
             throw new IllegalArgumentException("No employee found with name: " + name);

@@ -1,6 +1,11 @@
 package com.jaywant.Model;
 
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,11 +21,10 @@ public class AddSubAdmin {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
-
   private String name;
   private String lastname;
   private String stampImg;
-  private String signature; // Renamed to lowercase for consistency.
+  private String signature; // Renamed for consistency.
   private String email;
   private String phoneno;
   private String password;
@@ -31,6 +35,10 @@ public class AddSubAdmin {
   @OneToMany(mappedBy = "addSubAdmin")
   private List<AddEmployee> employees;
 
+  @JsonIgnore
+  private Collection<? extends GrantedAuthority> authorities;
+
+  // Getters and setters
   public int getId() {
     return id;
   }
@@ -119,8 +127,6 @@ public class AddSubAdmin {
     this.role = role;
   }
 
-  // Getters and Setters
-
   public List<AddEmployee> getEmployees() {
     return employees;
   }
@@ -128,5 +134,4 @@ public class AddSubAdmin {
   public void setEmployees(List<AddEmployee> employees) {
     this.employees = employees;
   }
-
 }

@@ -2,11 +2,21 @@ package com.jaywant.Model;
 
 import java.util.Collection;
 import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Employee")
@@ -39,6 +49,12 @@ public class AddEmployee implements UserDetails {
     private String roll = "EMPLOYEE";
     private String company;
 
+    private Long subAdminId;
+    private String subAdminName;
+
+    @JsonIgnore
+    private Collection<? extends GrantedAuthority> authorities;
+
     @JsonIgnore
     @ManyToOne
     private AddSubAdmin addSubAdmin;
@@ -51,37 +67,28 @@ public class AddEmployee implements UserDetails {
         // Default constructor
     }
 
-    public AddEmployee(int empId, String firstName, String lastName, String email, Long phone, String aadharNo,
-            String panCard, String education, String bloodGroup, String jobRole, String gender,
-            String address, String birthDate, String joiningDate, String status, String bankName,
-            String bankAccountNo, String bankIfscCode, String branchName, Long salary, String password,
-            String company, List<Attendance> attendance) {
-        this.empId = empId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phone = phone;
-        this.aadharNo = aadharNo;
-        this.panCard = panCard;
-        this.education = education;
-        this.bloodGroup = bloodGroup;
-        this.jobRole = jobRole;
-        this.gender = gender;
-        this.address = address;
-        this.birthDate = birthDate;
-        this.joiningDate = joiningDate;
-        this.status = status;
-        this.bankName = bankName;
-        this.bankAccountNo = bankAccountNo;
-        this.bankIfscCode = bankIfscCode;
-        this.branchName = branchName;
-        this.salary = salary;
-        this.password = password;
-        this.company = company;
-        this.attendance = attendance;
+    public Long getSubAdminId() {
+        return subAdminId;
+    }
+
+    public void setSubAdminId(Long subAdminId) {
+        this.subAdminId = subAdminId;
+    }
+
+    public String getSubAdminName() {
+        return subAdminName;
+    }
+
+    public void setSubAdminName(String subAdminName) {
+        this.subAdminName = subAdminName;
     }
 
     // Getters and setters
+
+    public String getRegisterCompanyName() {
+        return addSubAdmin != null ? addSubAdmin.getRegistercompanyname() : null;
+    }
+
     public int getEmpId() {
         return empId;
     }
@@ -282,8 +289,10 @@ public class AddEmployee implements UserDetails {
         this.attendance = attendance;
     }
 
-    // --- UserDetails interface methods ---
+    // --- Methods from UserDetails ---
+
     @Override
+    @JsonIgnore // Prevent JSON serialization of authorities
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(roll));
     }

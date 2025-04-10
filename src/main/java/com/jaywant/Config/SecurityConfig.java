@@ -87,9 +87,12 @@
 
 package com.jaywant.Config;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // Optional if you need to match HTTP methods later
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -99,6 +102,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.jaywant.Service.EmployeeDetailsServiceImpl;
 
@@ -110,7 +114,7 @@ public class SecurityConfig {
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return userDetailsService; // ✅ Return the autowired bean, not a new instance
+		return userDetailsService; // Return the autowired bean
 	}
 
 	@Bean
@@ -133,10 +137,18 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-				.csrf().disable()
+		http.csrf().disable()
+				.cors() // Ensure you have a CorsConfigurationSource defined as needed
+				.and()
 				.authorizeHttpRequests(auth -> auth
-						// Public endpoints for AdminController
+						// Permit static resources
+						.requestMatchers(new AntPathRequestMatcher("/**/*.jpeg")).permitAll()
+						.requestMatchers(new AntPathRequestMatcher("/**/*.jpg")).permitAll()
+						.requestMatchers(new AntPathRequestMatcher("/**/*.png")).permitAll()
+						.requestMatchers(new AntPathRequestMatcher("/**/*.gif")).permitAll()
+						.requestMatchers(new AntPathRequestMatcher("/**/*.svg")).permitAll()
+
+						// Public endpoints for Admin (if you use separate endpoints for admin)
 						.requestMatchers(
 								"/admin/register",
 								"/admin/login",
@@ -145,13 +157,13 @@ public class SecurityConfig {
 								"/admin/forgot-password/verify")
 						.permitAll()
 
-						// Existing public endpoints for EmployeeController
+						// Public endpoints for Employee Controller
 						.requestMatchers(
 								"/employee/register",
 								"/employee/login")
 						.permitAll()
 
-						// Existing public endpoints for SubAdminController
+						// Public endpoints for SubAdmin Controller (from SubAdminController)
 						.requestMatchers(
 								"/api/subadmin/create",
 								"/api/subadmin/login",
@@ -166,24 +178,11 @@ public class SecurityConfig {
 								"/api/subadmin/by-company/**")
 						.permitAll()
 
-						// Public endpoints for /public/** remain unchanged
-						.requestMatchers(
-								"/public/addEmp",
-								"/public/getAllEmp",
-								"/public/find/**",
-								"/public/update/**",
-								"/public/deleteEmp/**",
-								"/public/att",
-								"/public/getAllAtt",
-								"/public/getAllAttendace/**",
-								"/public/getAttendanceByName/**",
-								"/public/updateAttendanceStatus/**",
-								"/public/updateAttendanceStatusByEmpAndDate/**",
-								"/public/generateReport",
-								"/public/employee/forgot-password/request",
-								"/public/employee/forgot-password/verify",
-								"public/send-email/employee")
-						.permitAll()
+						// Public endpoints for Employee Management and Attendance endpoints under
+						// SubAdminController
+						// (Make sure your controller uses /employee/... rather than
+						// /subadmin/employee/... if you want cleaner URLs)
+						.requestMatchers("/api/subadmin/employee/**").permitAll()
 
 						// All other requests require authentication
 						.anyRequest().authenticated())
