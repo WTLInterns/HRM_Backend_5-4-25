@@ -30,7 +30,17 @@ public class AddSubAdmin {
   private String password;
   private String registercompanyname;
   private String companylogo;
-  private String role = "SUB_ADMIN";
+  private String role = "SUB_ADMIN";  
+  private String status;
+  
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
   @OneToMany(mappedBy = "addSubAdmin")
   private List<AddEmployee> employees;

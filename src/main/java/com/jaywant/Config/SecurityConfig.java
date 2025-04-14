@@ -87,12 +87,10 @@
 
 package com.jaywant.Config;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod; // Optional if you need to match HTTP methods later
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -114,7 +112,7 @@ public class SecurityConfig {
 
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return userDetailsService; // Return the autowired bean
+		return userDetailsService;
 	}
 
 	@Bean
@@ -138,53 +136,54 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()
-				.cors() // Ensure you have a CorsConfigurationSource defined as needed
+				.cors() // Uses the CorsConfig bean
 				.and()
 				.authorizeHttpRequests(auth -> auth
-						// Permit static resources
+						// Static resource access
 						.requestMatchers(new AntPathRequestMatcher("/**/*.jpeg")).permitAll()
 						.requestMatchers(new AntPathRequestMatcher("/**/*.jpg")).permitAll()
 						.requestMatchers(new AntPathRequestMatcher("/**/*.png")).permitAll()
 						.requestMatchers(new AntPathRequestMatcher("/**/*.gif")).permitAll()
 						.requestMatchers(new AntPathRequestMatcher("/**/*.svg")).permitAll()
 
-						// Public endpoints for Admin (if you use separate endpoints for admin)
+						// Admin endpoints
 						.requestMatchers(
 								"/admin/register",
+								"/admin/find/**",
 								"/admin/login",
 								"/admin/update",
 								"/admin/forgot-password/request",
 								"/admin/forgot-password/verify")
 						.permitAll()
 
-						// Public endpoints for Employee Controller
+						// Employee endpoints
 						.requestMatchers(
 								"/employee/register",
 								"/employee/login")
 						.permitAll()
 
-						// Public endpoints for SubAdmin Controller (from SubAdminController)
+						// SubAdmin endpoints
 						.requestMatchers(
 								"/api/subadmin/create",
 								"/api/subadmin/login",
 								"/api/subadmin/update-password/**",
 								"/api/subadmin/send-email/**",
 								"/api/subadmin/all",
+								"/api/subadmin/employees/**",
 								"/api/subadmin/subadminbygamil/**",
 								"/api/subadmin/delete/**",
 								"/api/subadmin/forgot-password/request",
 								"/api/subadmin/forgot-password/verify",
 								"/api/subadmin/update-fields/**",
-								"/api/subadmin/by-company/**")
+								"/api/subadmin/by-company/**",
+								"/api/subadmin/status/**",
+								"/api/subadmin/update/**")
 						.permitAll()
 
-						// Public endpoints for Employee Management and Attendance endpoints under
-						// SubAdminController
-						// (Make sure your controller uses /employee/... rather than
-						// /subadmin/employee/... if you want cleaner URLs)
+						// SubAdmin employee & attendance routes
 						.requestMatchers("/api/subadmin/employee/**").permitAll()
 
-						// All other requests require authentication
+						// All other requests
 						.anyRequest().authenticated())
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

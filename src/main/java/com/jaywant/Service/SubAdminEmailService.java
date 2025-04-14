@@ -1,10 +1,11 @@
 package com.jaywant.Service;
 
-import com.jaywant.Model.AddSubAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import com.jaywant.Model.AddSubAdmin;
 
 @Service
 public class SubAdminEmailService {
@@ -23,10 +24,10 @@ public class SubAdminEmailService {
         + "Hello " + fullName + ",\n\n"
         + "🎉 Welcome to WTL Tourism Pvt. Ltd.!\n\n"
         + "We're excited to have you on board as a HRM-Sub-Admin. Your account has been created successfully. Below are your login credentials:\n\n"
-        + "🆔 HRM SubAdmin ID: " + subAdmin.getId() + "\n"
+      
         + "📧 Email: " + subAdmin.getEmail() + "\n"
         + "🔐 Password: " + subAdmin.getPassword() + "\n\n"
-        + "👉 Click here to log in: https://wtl-tourism.com/HRMsubadmin/login\n\n"
+        + "👉 Click here to log in: http://localhost:5173/login\n\n"
         + "⚠️ Please change your password after your first login to ensure security.\n\n"
         + "If you face any issues, feel free to contact our support team.\n\n"
         + "Thanks & Regards,\n"

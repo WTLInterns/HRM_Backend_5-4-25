@@ -15,12 +15,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jaywant.DTO.EmployeeWithAttendanceDTO;
+import com.jaywant.DTO.SubAdminWithEmployeesDTO;
 import com.jaywant.Model.AddEmployee;
 import com.jaywant.Model.AddSubAdmin;
 import com.jaywant.Model.Attendance;
 import com.jaywant.Repo.AddEmployeeRepo;
 import com.jaywant.Repo.AddSubAdminRepository;
 import com.jaywant.Repo.AttendanceRepo;
+import com.jaywant.DTO.SubAdminWithEmployeesDTO;
 
 @Service
 public class AddSubAdminService {
@@ -30,6 +32,9 @@ public class AddSubAdminService {
 
   @Autowired
   private SubAdminEmailService mailService;
+
+  @Autowired
+  private AddSubAdminRepository subAdminRepo;
 
   private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -193,4 +198,22 @@ public class AddSubAdminService {
   public void deleteSubAdmin(int id) {
     repo.deleteById(id);
   }
+
+  // New method that returns DTOs with sub-admin details and their employees
+  public List<SubAdminWithEmployeesDTO> getAllSubAdminsWithEmployees() {
+    List<AddSubAdmin> subAdmins = subAdminRepo.findAll();
+    List<SubAdminWithEmployeesDTO> result = new ArrayList<>();
+    for (AddSubAdmin subAdmin : subAdmins) {
+      SubAdminWithEmployeesDTO dto = new SubAdminWithEmployeesDTO();
+      dto.setId(subAdmin.getId());
+      dto.setName(subAdmin.getName());
+      dto.setLastname(subAdmin.getLastname());
+      dto.setRegistercompanyname(subAdmin.getRegistercompanyname());
+      dto.setEmployees(subAdmin.getEmployees()); // This assumes employees is eagerly loaded or properly configured for
+                                                 // lazy loading
+      result.add(dto);
+    }
+    return result;
+  }
+
 }

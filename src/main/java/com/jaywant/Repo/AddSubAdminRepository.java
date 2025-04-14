@@ -16,4 +16,7 @@ public interface AddSubAdminRepository extends JpaRepository<AddSubAdmin, Intege
 
     List<AddSubAdmin> findByRegistercompanyname(String registercompanyname);
 
+    List<AddSubAdmin> findByStatus(String status);
+
+
 }

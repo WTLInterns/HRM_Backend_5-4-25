@@ -49,6 +49,7 @@ public class SubAdminController {
       @RequestParam String email,
       @RequestParam String phoneno,
       @RequestParam String registercompanyname,
+      @RequestParam String status,
       @RequestParam("stampImg") MultipartFile stampImgFile,
       @RequestParam("signature") MultipartFile signatureFile,
       @RequestParam("companylogo") MultipartFile logoFile) {
@@ -58,6 +59,7 @@ public class SubAdminController {
     subAdmin.setLastname(lastname);
     subAdmin.setEmail(email);
     subAdmin.setPhoneno(phoneno);
+    subAdmin.setStatus(status);
     subAdmin.setRegistercompanyname(registercompanyname);
 
     try {

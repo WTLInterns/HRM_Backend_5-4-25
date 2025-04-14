@@ -241,8 +241,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jaywant.DTO.SalaryDTO;
+import com.jaywant.DTO.SubAdminWithEmployeesDTO;
 import com.jaywant.Model.AddEmployee;
 import com.jaywant.Model.Attendance;
+import com.jaywant.Service.AddSubAdminService;
 import com.jaywant.Service.AttendaceService;
 import com.jaywant.Service.EmployeeEmailService;
 import com.jaywant.Service.EmployeePasswordResetService;
@@ -251,7 +253,7 @@ import com.jaywant.Service.SalaryService;
 
 @RestController
 @RequestMapping("/api/subadmin")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class AdminController {
 
     @Autowired
@@ -265,6 +267,9 @@ public class AdminController {
 
     @Autowired
     private EmployeeEmailService employeeEmailService;
+
+    @Autowired
+    private AddSubAdminService subAdminService;
 
     @Autowired
     private EmployeePasswordResetService employeePasswordResetService;
@@ -289,9 +294,20 @@ public class AdminController {
 
     // GET: Get all employees by company
     // URL: GET /api/subadmin/employee/{companyName}/all
-    @GetMapping("/employee/{companyName}/all")
-    public ResponseEntity<List<AddEmployee>> getAllEmployeesByCompany(@PathVariable String companyName) {
+    // @GetMapping("/employee/{companyName}/all")
+    // public ResponseEntity<List<AddEmployee>>
+    // getAllEmployeesByCompany(@PathVariable String companyName) {
+    // List<AddEmployee> employees = empService.getEmployeesByCompany(companyName);
+    // return ResponseEntity.ok(employees);
+    // }
+
+    @GetMapping("/employees/{companyName}/all")
+    public ResponseEntity<List<AddEmployee>> getEmployeesByCompany(@PathVariable String companyName) {
         List<AddEmployee> employees = empService.getEmployeesByCompany(companyName);
+        if (employees == null || employees.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(employees);
+        }
         return ResponseEntity.ok(employees);
     }
 
